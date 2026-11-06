@@ -11,11 +11,13 @@ import { tokens } from '../theme/tokens';
 export interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
+  inputRef?: React.RefObject<any>;
 }
 
 export const Input: React.FC<InputProps> = ({
   label,
   error,
+  inputRef,
   style,
   ...rest
 }) => {
@@ -23,6 +25,7 @@ export const Input: React.FC<InputProps> = ({
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
       <TextInput
+        ref={inputRef}
         style={[styles.input, error ? styles.inputError : null, style]}
         placeholderTextColor={tokens.colors.textMuted}
         accessibilityLabel={label}
