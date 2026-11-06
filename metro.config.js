@@ -7,3 +7,4 @@ if (!config.resolver.assetExts.includes('db')) {
 }
 
 module.exports = config;
+

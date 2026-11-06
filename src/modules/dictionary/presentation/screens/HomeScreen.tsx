@@ -56,13 +56,19 @@ export const HomeScreen: React.FC = () => {
     }
   }, [activeUserId, activeTab]);
 
+  const isFirstMount = React.useRef(true);
+
   // Debounce para busca
   useEffect(() => {
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
     const timer = setTimeout(() => {
       setSearchTerm(searchInput);
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchInput]);
+  }, [searchInput, setSearchTerm]);
 
   // Lista de palavras a ser exibida no Grid dependendo da aba ativa
   const currentWordsList = useMemo(() => {

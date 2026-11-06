@@ -5,4 +5,5 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   testMatch: ['**/__tests__/**/*.test.{ts,tsx}'],
+  watchman: false,
 };

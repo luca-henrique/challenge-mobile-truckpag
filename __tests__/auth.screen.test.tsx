@@ -57,3 +57,4 @@ describe('AuthScreen Component Tests', () => {
     expect(state.isGuest).toBe(true);
   });
 });
+

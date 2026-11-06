@@ -12,8 +12,22 @@ describe('HomeScreen Component Tests', () => {
   beforeEach(() => {
     queryClient = new QueryClient({
       defaultOptions: {
-        queries: { retry: false },
+        queries: { retry: false, gcTime: 0 },
       },
+    });
+
+    container.setDictionaryService({
+      fetchWordDetail: jest.fn().mockResolvedValue({
+        word: 'today',
+        phonetic: '/təˈdeɪ/',
+        phonetics: [],
+        meanings: [
+          {
+            partOfSpeech: 'noun',
+            definitions: [{ definition: 'This present day' }],
+          },
+        ],
+      }),
     });
 
     container.setFavoriteRepository({
@@ -45,6 +59,7 @@ describe('HomeScreen Component Tests', () => {
       isLoading: false,
       error: null,
       isGuest: false,
+      initSession: jest.fn().mockResolvedValue(undefined),
     });
 
     useWordStore.setState({
@@ -57,12 +72,17 @@ describe('HomeScreen Component Tests', () => {
       isLoadingWords: false,
       hasMoreWords: false,
       searchTerm: '',
+      loadInitialWords: jest.fn().mockResolvedValue(undefined),
+      loadFavorites: jest.fn().mockResolvedValue(undefined),
+      loadHistory: jest.fn().mockResolvedValue(undefined),
+      recordWordView: jest.fn().mockResolvedValue(undefined),
     });
 
     jest.clearAllMocks();
   });
 
   afterEach(() => {
+    queryClient.clear();
     container.reset();
   });
 
@@ -119,12 +139,13 @@ describe('HomeScreen Component Tests', () => {
   });
 
   it('deve abrir o modal de detalhes ao tocar em uma palavra do grid', async () => {
-    const { getByText } = renderWithProviders(<HomeScreen />);
+    const { getByText, findByText } = renderWithProviders(<HomeScreen />);
 
     await act(async () => {
       fireEvent.press(getByText('today'));
     });
 
     expect(useWordStore.getState().selectedWord).toBe('today');
+    expect(await findByText(/This present day/)).toBeTruthy();
   });
 });
