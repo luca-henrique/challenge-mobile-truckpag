@@ -112,4 +112,28 @@ describe('SqliteAuthRepository (LocalAuthRepository) Unit Tests', () => {
       repository.signIn('user@truckpag.com', 'wrong_password')
     ).rejects.toThrow('Senha incorreta.');
   });
+
+  it('deve realizar login com a conta pre-configurada de admin (admin@truckpag.com)', async () => {
+    const salt = '3755ecde-6918-431a-98e2-a764ca07525d';
+    const password = '123456';
+    const expectedHash = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      `${salt}:${password}`
+    );
+
+    mockDb.getFirstAsync.mockResolvedValueOnce({
+      id: 'user-admin-truckpag',
+      name: 'Admin TruckPag',
+      email: 'admin@truckpag.com',
+      password_hash: expectedHash,
+      salt: salt,
+      created_at: '2026-11-06T00:00:00.000Z',
+    });
+
+    const user = await repository.signIn('admin@truckpag.com', '123456');
+
+    expect(user.id).toBe('user-admin-truckpag');
+    expect(user.name).toBe('Admin TruckPag');
+    expect(user.email).toBe('admin@truckpag.com');
+  });
 });

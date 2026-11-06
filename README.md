@@ -141,6 +141,17 @@ Conforme orientado no desafio, documentamos abaixo as hipóteses investigadas, t
    - Interface `IAuthRepository` totalmente desacoplada, permitindo chavear para **Supabase** sem alterar a camada visual.
    - Suporte a modo visitante (*Guest mode*) e perfil de usuário.
 
+#### 👤 Usuários Pré-configurados para Teste / Login:
+
+Para agilizar os testes e avaliação, foram pré-cadastrados **2 usuários de demonstração** no banco local (já com histórico e favoritos vinculados):
+
+| Usuário | E-mail | Senha | Dados e Histórico Inicial |
+| :--- | :--- | :---: | :--- |
+| **Admin TruckPag** | `admin@truckpag.com` | `123456` | Favoritos: *hello*, *peace*, *great* • Histórico: *hello*, *today* |
+| **Lucas Developer** | `user@truckpag.com` | `123456` | Favoritos: *value*, *common* • Histórico: *watch*, *review* |
+
+> 💡 **Nota:** Também é possível criar novas contas a qualquer momento pela aba **Cadastrar** ou navegar sem credenciais clicando em **Continuar como Visitante**.
+
 2. **Diferencial 3 - Testes Automatizados:**
    - **38 testes automatizados** com Jest e React Native Testing Library cobrindo navegação, rotas privadas/públicas, serviços de API, repositórios SQLite com salt, stores Zustand e componentes de interface.
    - Execução via `npm test`.
