@@ -64,6 +64,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ isLoading: true, error: null });
       await container.authRepository.signOut();
+      try {
+        const { queryClient } = require('../../../../core/network/query-client');
+        if (queryClient && typeof queryClient.clear === 'function') {
+          queryClient.clear();
+        }
+      } catch {
+        // Ignora se em ambiente sem query client
+      }
       set({ user: null, isGuest: false, isLoading: false });
     } catch (err: any) {
       set({ error: err.message || 'Falha ao deslogar', isLoading: false });

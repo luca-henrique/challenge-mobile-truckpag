@@ -1,22 +1,29 @@
 import * as Crypto from 'expo-crypto';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { IAuthRepository } from '../domain/repositories/auth.repository.interface';
 import { User } from '../domain/entities/user';
 import { getDatabase } from '../../../core/storage/database';
 
-const SESSION_KEY = '@truckpag:auth_user_id';
+const SESSION_KEY = 'truckpag_auth_user_id';
 
 interface UserRow {
   id: string;
   email: string;
-  password_hash: string;
   name: string | null;
+  password_hash: string;
+  salt: string;
   created_at: string;
 }
 
 export class LocalAuthRepository implements IAuthRepository {
-  private async hashPassword(password: string): Promise<string> {
-    return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, password);
+  /**
+   * Calcula o hash SHA-256 com Salt único para proteção contra ataques de rainbow table
+   */
+  private async hashPassword(password: string, salt: string): Promise<string> {
+    return Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      `${salt}:${password}`
+    );
   }
 
   async signUp(email: string, password: string, name?: string): Promise<User> {
@@ -39,13 +46,14 @@ export class LocalAuthRepository implements IAuthRepository {
     }
 
     const id = Crypto.randomUUID();
-    const passwordHash = await this.hashPassword(password);
+    const salt = Crypto.randomUUID();
+    const passwordHash = await this.hashPassword(password, salt);
     const createdAt = new Date().toISOString();
     const userName = name?.trim() || cleanEmail.split('@')[0];
 
     await db.runAsync(
-      'INSERT INTO users (id, email, password_hash, name, created_at) VALUES (?, ?, ?, ?, ?)',
-      [id, cleanEmail, passwordHash, userName, createdAt]
+      'INSERT INTO users (id, name, email, password_hash, salt, created_at) VALUES (?, ?, ?, ?, ?, ?)',
+      [id, userName, cleanEmail, passwordHash, salt, createdAt]
     );
 
     const user: User = {
@@ -55,7 +63,7 @@ export class LocalAuthRepository implements IAuthRepository {
       createdAt,
     };
 
-    await AsyncStorage.setItem(SESSION_KEY, id);
+    await SecureStore.setItemAsync(SESSION_KEY, id);
     return user;
   }
 
@@ -75,7 +83,7 @@ export class LocalAuthRepository implements IAuthRepository {
       throw new Error('Usuário não encontrado.');
     }
 
-    const passwordHash = await this.hashPassword(password);
+    const passwordHash = await this.hashPassword(password, userRow.salt);
     if (userRow.password_hash !== passwordHash) {
       throw new Error('Senha incorreta.');
     }
@@ -87,17 +95,21 @@ export class LocalAuthRepository implements IAuthRepository {
       createdAt: userRow.created_at,
     };
 
-    await AsyncStorage.setItem(SESSION_KEY, user.id);
+    await SecureStore.setItemAsync(SESSION_KEY, user.id);
     return user;
   }
 
   async signOut(): Promise<void> {
-    await AsyncStorage.removeItem(SESSION_KEY);
+    try {
+      await SecureStore.deleteItemAsync(SESSION_KEY);
+    } catch {
+      // Ignora erro se a chave não existir
+    }
   }
 
   async getCurrentUser(): Promise<User | null> {
     try {
-      const activeId = await AsyncStorage.getItem(SESSION_KEY);
+      const activeId = await SecureStore.getItemAsync(SESSION_KEY);
       if (!activeId) {
         return null;
       }
@@ -109,7 +121,7 @@ export class LocalAuthRepository implements IAuthRepository {
       );
 
       if (!userRow) {
-        await AsyncStorage.removeItem(SESSION_KEY);
+        await SecureStore.deleteItemAsync(SESSION_KEY);
         return null;
       }
 
@@ -124,4 +136,3 @@ export class LocalAuthRepository implements IAuthRepository {
     }
   }
 }
-
