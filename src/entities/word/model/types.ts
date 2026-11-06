@@ -35,3 +35,4 @@ export interface FavoriteItem {
   word: string;
   createdAt: string;
 }
+
