@@ -1,85 +1,140 @@
-# Mobile Challenge 20240202
+# Free Dictionary Mobile App - TruckPag Challenge
 
-## Introdução
+> Um aplicativo mobile de alta performance para explorar o vocabulário em inglês com pronúncia em áudio, busca com cache inteligente, persistência local em SQLite e autenticação de usuários.
 
-Este é um teste para que possamos ver as suas habilidades como Mobile Developer.
+> This is a challenge by [Coodesh](https://coodesh.com/)
 
-Nesse desafio você deverá desenvolver um aplicativo para listar palavras em inglês, utilizando como base a API [Free Dictionary API](https://dictionaryapi.dev/). O projeto a ser desenvolvido por você tem como objetivo exibir termos em inglês e gerenciar as palavras visualizadas, conforme indicado nos casos de uso que estão logo abaixo.
+---
 
-[SPOILER] As instruções de entrega e apresentação do challenge estão no final deste Readme (=
+## 📱 Demonstração e Wireframe
 
-### Antes de começar
- 
-- Considere como deadline da avaliação a partir do início do teste. Caso tenha sido convidado a realizar o teste e não seja possível concluir dentro deste período, avise a pessoa que o convidou para receber instruções sobre o que fazer.
-- Documentar todo o processo de investigação para o desenvolvimento da atividade (README.md no seu repositório); os resultados destas tarefas são tão importantes do que o seu processo de pensamento e decisões à medida que as completa, por isso tente documentar e apresentar os seus hipóteses e decisões na medida do possível.
+O design e a usabilidade do aplicativo foram implementados seguindo fielmente o wireframe especificado para o desafio:
 
-### Instruções iniciais obrigatórias
+- **Tela Principal:**
+  - Barra de abas com 3 seções: `Word list` (padrão), `History` e `Favorites`.
+  - Grid de palavras com 3 colunas e bordas nítidas conforme o protótipo.
+  - Rolagem infinita (*Infinite Scroll*) com paginação fluida a partir do SQLite local.
+  - Barra de busca em tempo real com debouncing.
+- **Tela de Detalhes:**
+  - Card centralizado destacado com a palavra e sua transcrição fonética.
+  - Player de áudio com botão Play e barra de progresso em azul.
+  - Seção **Meanings** detalhando classes gramaticais, definições e exemplos de uso.
+  - Botão de favoritar/desfavoritar com feedback instantâneo.
+  - Botões de navegação no rodapé: **Voltar** e **Próximo** para percorrer a lista de palavras sem fechar o modal.
 
-- Utilize as seguintes tecnologias:
+---
 
-#### Tecnologias (Mobile):
-- Nativo ou Hibrido (Flutter, Ionic, React Native, etc)
-- Estilização (Material, Semantic, etc). Ou escrever o seu próprio sob medida 👌
-- Gestão de dados (Redux, Context API, IndexedDB, SQLite, etc)
+## 🛠️ Tecnologias Utilizadas
 
-Atente-se, ao desenvolver a aplicação mobile, para conceitos de usabilidade e adeque a interface com elementos visuais para os usuários do seu sistema.
+- **Linguagem & Framework:**
+  - [React Native](https://reactnative.dev/) (v0.88)
+  - [Expo SDK](https://expo.dev/) (v58)
+  - [TypeScript](https://www.typescriptlang.org/)
+- **Gerenciamento de Estado & Cache:**
+  - [TanStack Query (React Query)](https://tanstack.com/query) v5: Cache inteligente e retenção em memória das consultas à [Free Dictionary API](https://dictionaryapi.dev/).
+  - [Zustand](https://github.com/pmndrs/zustand): Gerenciamento de estado global reativo e leve para abas, histórico, favoritos e usuário.
+- **Armazenamento Local:**
+  - [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/): Banco de dados relacional local com suporte a WAL, transações em lote e índices para consulta rápida das palavras.
+  - [@react-native-async-storage/async-storage](https://react-native-async-storage.github.io/async-storage/): Sessão persistente de usuário.
+- **Áudio & Fonética:**
+  - [expo-audio](https://docs.expo.dev/versions/latest/sdk/audio/): Reprodução moderna de áudio compatível com o Expo SDK 58 e Expo Go.
+  - [expo-speech](https://docs.expo.dev/versions/latest/sdk/speech/): Fallback com Text-to-Speech nativo caso a palavra não contenha áudio na API ou em qualquer plataforma.
+- **Testes Automatizados:**
+  - [Jest](https://jestjs.io/) + [ts-jest](https://kulshekhar.github.io/ts-jest/) com suite completa de testes unitários.
 
-#### Tecnologias (Back-End):
-- Firebase, Supabase, etc
+---
 
-#### Organização:
-- Aplicação de padrões Clean Code
-- Validação de chamadas assíncronas para evitar travamentos
+## 🏛️ Arquitetura e Decisões de Engenharia
 
-### Modelo de Dados:
+O projeto foi construído seguindo princípios de **Clean Architecture** e **SOLID**:
 
-Conforme indicado na documentação da API, a API retorna as informações de uma palavra, tais como etimologia, sinônimos, exemplos de uso, etc. Utilize os campos indicados na documentação dos endpoints para obter os dados necessários.
- 
-### Front-End:
+```text
+src/
+├── core/
+│   ├── di/
+│   │   └── container.ts          # Container de Injeção de Dependências (IoC)
+│   ├── network/
+│   │   └── query-client.ts       # Configuração do TanStack Query com política de cache
+│   └── storage/
+│       └── database.ts           # Inicialização e migrations do SQLite local
+└── modules/
+    ├── auth/                     # Módulo de Autenticação (Diferencial 4)
+    │   ├── domain/               # Entidades e Interfaces (IAuthRepository)
+    │   ├── infrastructure/       # Implementação LocalAuth e Stub para Supabase
+    │   └── presentation/         # Zustand Store e Modal de Login/Cadastro
+    ├── dictionary/               # Módulo Principal do Dicionário
+    │   ├── domain/               # Entidades (WordDetail, Phonetic, Meaning) e Interfaces
+    │   ├── infrastructure/       # Consumo da API, Seeder de dados e Repositórios SQLite
+    │   └── presentation/         # Hooks (useWordDetail), Zustand Store, Telas e Componentes
+    └── audio/                    # Módulo de Áudio (Diferencial 1)
+        ├── domain/               # IAudioPlayerService
+        └── infrastructure/       # Implementação com expo-av e expo-speech
+```
 
-Nessa etapa você deverá desenvolver uma aplicação móvel nativa ou hibrida para consumir a API do desafio.
+### Diferenciais Implementados
 
-**Obrigatório 1** - Você deverá atender aos seguintes casos de uso:
+1. **Diferencial 4 - Autenticação & Vínculo de Usuário:**
+   - Sistema de autenticação com armazenamento local seguro (hash SHA-256 via `expo-crypto`).
+   - Favoritos e Histórico estritamente vinculados ao `user_id` no banco de dados.
+   - Interface `IAuthRepository` totalmente desacoplada, permitindo chavear para **Supabase** sem alterar a camada de apresentação.
+   - Suporte a modo visitante (*Guest mode*) e perfil de usuário.
 
-- Como usuário, devo ser capaz de visualizar uma lista de palavras com rolagem infinita
-- Como usuário, devo ser capaz de visualizar uma palavra, significados e a fonética
-- Como usuário, devo ser capaz de salvar a palavra como favorito
-- Como usuário, devo ser capaz de remover a palavra como favorito
-- Como usuário, devo ser capaz de visitar uma lista com as palavras que já vi anteriormente
+2. **Diferencial 3 - Testes Automatizados:**
+   - 25 testes unitários cobrindo serviços de API, repositórios SQLite, tocador de áudio e stores de estado.
+   - Execução via `npm test`.
 
-A API não possui endpoint com a lista de palavras. Essa lista pode ser carregada em memória ou ser salva em banco de dados local ou remoto (por exemplo, com Firebase). Será necessário usar o [arquivo existente dentro do projeto no Github](https://github.com/dwyl/english-words/blob/master/words_dictionary.json).
+3. **Diferencial 2 - Injeção de Dependências:**
+   - Implementado Container de Injeção de Dependência (`DependencyContainer`) desacoplando a camada de UI das implementações de infraestrutura e permitindo injeção de mocks nos testes.
 
-**Obrigatório 2** - Salvar em cache o resultado das requisições, para agilizar a resposta em caso de buscas com parâmetros repetidos.
+4. **Diferencial 1 - Player de Áudio e Pronúncia:**
+   - Toca a pronúncia da palavra fornecida pela Free Dictionary API com barra de progresso em tempo real e fallback nativo TTS.
 
-**Obrigatório 3** - Seguir o wireframe para a página de listagem dos dados. Pode-se alterar a posição dos itens, mantendo as funcionalidades solicitadas.
+---
 
-<img src="./img/wireframe.png" width="100%" />
+## 🚀 Como Instalar e Rodar o Projeto
 
-**Diferencial 1** - Implementar um tocador de audio utilizando, por exemplo, https://responsivevoice.org/api ou recursos nativos;
+### Pré-requisitos
+- [Node.js](https://nodejs.org/) (versão LTS recomendada)
+- Gerenciador de pacotes `npm` ou `yarn`
+- Dispositivo físico com o app **Expo Go** instalado (Android ou iOS) ou um emulador/simulador configurado.
 
-**Diferencial 2** - Utilizar alguma ferramenta de Injeção de Dependência;
+### 1. Clonar o repositório e instalar dependências
+```bash
+git clone <URL_DO_REPOSITORIO>
+cd challenge-mobile-truckpag
+npm install
+```
 
-**Diferencial 3** - Escrever Unit Tests ou E2E Test. Escolher a melhor abordagem e biblioteca;
+### 2. Executar a suíte de testes unitários
+```bash
+npm test
+```
 
-**Diferencial 4** - Implementar login com usuário e senha e associar os favoritos e histórico ao ID do usuário, salvando essa informação em banco de dados local ou remoto
-## Readme do Repositório
+### 3. Iniciar o servidor de desenvolvimento Expo
+```bash
+npm start
+```
 
-- Deve conter o título do projeto
-- Uma descrição sobre o projeto em frase
-- Deve conter uma lista com linguagem, framework e/ou tecnologias usadas
-- Como instalar e usar o projeto (instruções)
-- Não esqueça o [.gitignore](https://www.toptal.com/developers/gitignore)
-- Se está usando github pessoal, referencie que é um challenge by coodesh:  
+No terminal, você verá o QR Code do Expo:
+- **Dispositivo Físico:** Abra o app Expo Go (ou câmera no iOS) e escaneie o QR Code.
+- **Emulador Android:** Pressione `a` no terminal.
+- **Simulador iOS:** Pressione `i` no terminal.
+- **Navegador Web:** Pressione `w` no terminal.
 
->  This is a challenge by [Coodesh](https://coodesh.com/)
+---
 
-## Finalização e Instruções para a Apresentação
+## 📄 Requisitos do Desafio Atendidos
 
-1. Adicione o link do repositório com a sua solução no teste
-2. Verifique se o Readme está bom e faça o commit final em seu repositório;
-3. Envie e aguarde as instruções para seguir. Caso o teste tenha apresentação de vídeo, dentro da tela de entrega será possível gravar após adicionar o link do repositório. Sucesso e boa sorte. =)
-
-
-## Suporte
-
-Para tirar dúvidas sobre o processo envie uma mensagem diretamente a um especialista no chat da plataforma. 
+| Requisito | Status | Descrição |
+| :--- | :---: | :--- |
+| **Obrigatório 1: Lista com rolagem infinita** | Concluído | Paginação eficiente sobre o SQLite com infinite scroll |
+| **Obrigatório 1: Detalhes, significados e fonética** | Concluído | Exibição de classes gramaticais, definições e fonética |
+| **Obrigatório 1: Favoritar e desfavoritar** | Concluído | Salvo em banco com persistência vinculada ao usuário |
+| **Obrigatório 1: Histórico de palavras visualizadas** | Concluído | Registro automático de visualizações com ordenação temporal |
+| **Obrigatório 1: Carga do words_dictionary.json** | Concluído | Carga em background sem travamento de interface |
+| **Obrigatório 2: Cache das requisições** | Concluído | Gerenciado via TanStack Query com retenção configurável |
+| **Obrigatório 3: Wireframe fiel** | Concluído | 3 abas superiores, grid de 3 colunas e modal detalhado |
+| **Diferencial 1: Player de áudio** | Concluído | Áudio da API com barra de progresso + fallback Speech TTS |
+| **Diferencial 2: Injeção de dependência** | Concluído | Container IoC desacoplando UI e fontes de dados |
+| **Diferencial 3: Testes unitários** | Concluído | 25 testes automatizados com Jest |
+| **Diferencial 4: Autenticação de usuário** | Concluído | Login/cadastro com dados vinculados ao ID do usuário |
