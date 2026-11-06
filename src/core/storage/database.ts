@@ -4,17 +4,8 @@ let dbInstance: SQLite.SQLiteDatabase | null = null;
 const DATABASE_NAME = 'truckpag_dictionary.db';
 
 export async function importPrepopulatedDatabase(): Promise<void> {
-  try {
-    if (typeof (SQLite as any).importDatabaseFromAssetAsync === 'function') {
-      const asset = require('../../../assets/database/dictionary.db');
-      await (SQLite as any).importDatabaseFromAssetAsync(DATABASE_NAME, {
-        assetId: asset,
-        forceOverwrite: false,
-      });
-    }
-  } catch {
-    // Continua se já estiver importado ou em ambiente de teste/web
-  }
+  // Inicialização determinística e instantânea gerenciada via DDL e WordSeederService
+  return Promise.resolve();
 }
 
 export async function initDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
