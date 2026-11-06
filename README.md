@@ -78,16 +78,20 @@ src/
 Conforme orientado no desafio, documentamos abaixo as hipóteses investigadas, trade-offs analisados e as decisões tomadas durante a engenharia da aplicação:
 
 ### 1. Carga de Dados e Performance com ~370.000 Palavras
-- **Cenário Investigado:** O arquivo `words_dictionary.json` contém mais de 370 mil termos (~6.5 MB). Carregar esse JSON na memória da thread JavaScript do React Native durante o startup causaria travamento visível (Time-to-Interactive alto e risco de Out-of-Memory em aparelhos mais modestos).
-- **Hipótese & Decisão:** Implementamos uma estratégia em dois níveis via `WordSeederService`:
-  1. *Seed Prioritário Imediato:* Carrega uma lista inicial instantânea (incluindo as palavras presentes no wireframe oficial: `hello`, `today`, `great`, etc.), permitindo que a tela principal abra em **menos de 50ms**.
-  2. *Batch Insert em Segundo Plano:* O restante das 370.000 palavras é inserido no SQLite em transações em lotes de 1.000 registros (`withTransactionAsync`), liberando fatias de tempo para o event loop do JS via pausas controladas, com modo WAL (`Write-Ahead Logging`) e índices B-Tree ativos.
+- **Cenário Investigado:** O arquivo `words_dictionary.json` contém mais de 370 mil termos (~6.5 MB). Carregar e parsear esse JSON na thread JavaScript do React Native durante o startup causaria travamento visível (Time-to-Interactive alto e risco de Out-of-Memory).
+- **Hipótese & Decisão:** Implementamos a geração offline do banco SQLite (`assets/database/dictionary.db`) através do script `scripts/generate_db.py`.
+  - As 370.100 palavras são inseridas em lote com transações otimizadas.
+  - O índice B-Tree `idx_words_word ON words(word COLLATE NOCASE)` é construído após a carga em massa.
+  - O Metro Bundler (`metro.config.js`) foi configurado para empacotar o arquivo `.db` como asset nativo.
+  - O app utiliza `importDatabaseFromAssetAsync` do `expo-sqlite`, habilitando modo WAL (`Write-Ahead Logging`) e chaves estrangeiras (`PRAGMA foreign_keys = ON`), garantindo inicialização instantânea sem processamento na thread JS.
 
-### 2. Estratégia de Cache da API (Obrigatório 2)
-- **Cenário Investigado:** A *Free Dictionary API* fornece definições estáticas (o significado de uma palavra não muda no tempo). Requisições repetidas para a mesma palavra desperdiçam franquia de dados do usuário e adicionam latência de rede.
-- **Hipótese & Decisão:** Adotamos o **TanStack Query (React Query) v5**:
-  - `staleTime: 24 horas` e `gcTime: 7 dias`.
-  - Ao abrir uma palavra já consultada (seja pela lista, histórico ou favoritos), os dados são entregues instantaneamente do cache em memória sem emitir novas requisições HTTP.
+### 2. Estratégia de Cache e Persistência Offline da API (Obrigatório 2)
+- **Cenário Investigado:** A *Free Dictionary API* fornece definições estáticas. Requisições repetidas para a mesma palavra desperdiçam franquia de dados e adicionam latência desnecessária.
+- **Hipótese & Decisão:** Adotamos o **TanStack Query (React Query) v5** com persistência offline:
+  - `PersistQueryClientProvider` integrado ao `@tanstack/query-async-storage-persister`.
+  - Cache retido em disco com `staleTime: 24 horas` e `maxAge: 7 dias`.
+  - Sincronização inteligente com o ciclo de vida nativo via `setupQueryFocusManager()` escutando eventos do `AppState`.
+  - Ao reabrir o app ou consultar qualquer termo visualizado anteriormente, as definições são recuperadas instantaneamente do storage local.
 
 ### 3. Resiliência de Áudio e Evolução do Ecossistema Expo (Diferencial 1)
 - **Cenário Investigado:** No Expo SDK 58, o módulo legado `expo-av` foi descontinuado e não está presente nos builds recentes do Expo Go. Além disso, muitas palavras na API não possuem arquivo MP3 gravado em `phonetics[].audio`.
@@ -95,32 +99,35 @@ Conforme orientado no desafio, documentamos abaixo as hipóteses investigadas, t
   1. *expo-audio:* Módulo oficial moderno do SDK 58 para tocar arquivos remotos com tracking de progresso em tempo real.
   2. *Fallback Nativo (expo-speech):* Caso o termo não possua áudio gravado ou a rede falhe, o app aciona automaticamente o sintetizador Text-to-Speech nativo em inglês (`en-US`), com animação sintética da barra de progresso, garantindo que o usuário sempre ouça a pronúncia.
 
-### 4. Isolamento por Usuário e Preparação para Nuvem (Diferencial 4)
-- **Cenário Investigado:** O requisito prevê autenticação local ou remota associando histórico e favoritos ao ID do usuário.
+### 4. Segurança, Autenticação Local e Isolamento (Diferencial 4)
+- **Cenário Investigado:** O requisito prevê autenticação associando histórico e favoritos ao ID do usuário em banco local ou remoto.
 - **Hipótese & Decisão:**
-  - Modelamos o contrato `IAuthRepository` de forma pura.
-  - Implementamos a persistência local em SQLite com hash SHA-256 (`expo-crypto`) e sessão em `AsyncStorage`.
-  - Criamos o stub `SupabaseAuthRepository` pronto para receber chaves de produção, permitindo transicionar de local para nuvem simplesmente alterando o registro no `DependencyContainer` (Diferencial 2).
+  - Tabela `users` com colunas `id` (UUID), `name`, `email` (UNIQUE COLLATE NOCASE), `password_hash` e `salt`.
+  - Criptografia com **Hash SHA-256 + Salt único** por usuário gerado via `Crypto.randomUUID()`, prevenindo ataques de rainbow table.
+  - Persistência segura da sessão ativa via **`expo-secure-store`** (armazenamento criptografado no Keychain do iOS e Keystore do Android).
+  - Fluxo de proteção de rotas com **`AuthGate`** e tela de autenticação **`AuthScreen`**, além de suporte a modo convidado.
+  - Chaveamento pronto para nuvem (**Supabase**) via injeção de dependências no `DependencyContainer` (Diferencial 2).
 
 ---
 
 ### Diferenciais Implementados
 
 1. **Diferencial 4 - Autenticação & Vínculo de Usuário:**
-   - Sistema de autenticação com armazenamento local seguro (hash SHA-256 via `expo-crypto`).
-   - Favoritos e Histórico estritamente vinculados ao `user_id` no banco de dados.
-   - Interface `IAuthRepository` totalmente desacoplada, permitindo chavear para **Supabase** sem alterar a camada de apresentação.
+   - Sistema de autenticação com armazenamento local seguro (hash SHA-256 com Salt único via `expo-crypto`).
+   - Sessão criptografada no Keychain / Keystore com `expo-secure-store`.
+   - Favoritos e Histórico estritamente vinculados ao `user_id` com chaves estrangeiras (`ON DELETE CASCADE`).
+   - Interface `IAuthRepository` totalmente desacoplada, permitindo chavear para **Supabase** sem alterar a camada visual.
    - Suporte a modo visitante (*Guest mode*) e perfil de usuário.
 
 2. **Diferencial 3 - Testes Automatizados:**
-   - 25 testes unitários cobrindo serviços de API, repositórios SQLite, tocador de áudio e stores de estado.
+   - **34 testes automatizados** com Jest e React Native Testing Library cobrindo serviços de API, repositórios SQLite com salt, stores Zustand e componentes de interface (`AuthScreen`, `HomeScreen`).
    - Execução via `npm test`.
 
 3. **Diferencial 2 - Injeção de Dependências:**
-   - Implementado Container de Injeção de Dependência (`DependencyContainer`) desacoplando a camada de UI das implementações de infraestrutura e permitindo injeção de mocks nos testes.
+   - Container IoC (`DependencyContainer`) desacoplando a camada de UI das implementações de infraestrutura e permitindo injeção de mocks nos testes.
 
 4. **Diferencial 1 - Player de Áudio e Pronúncia:**
-   - Toca a pronúncia da palavra fornecida pela Free Dictionary API com barra de progresso em tempo real e fallback nativo TTS.
+   - Reprodução de áudio via `expo-audio` com barra de progresso em tempo real e fallback nativo TTS (`expo-speech`).
 
 ---
 
