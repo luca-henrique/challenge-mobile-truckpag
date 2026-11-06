@@ -187,3 +187,4 @@ Os módulos de negócio em `src/modules/` alimentam a arquitetura Feature-Sliced
 - **`src/entities/`**: Expõe os modelos e células atômicas reutilizáveis (`WordCell`, tipos de usuário e palavra).
 - **`src/features/`**: Agrupa os fluxos de valor de negócio com subcomponentes de no máximo 120 linhas (`auth`, `word-detail`).
 - **`src/widgets/`**: Monta os blocos de tela autônomos (`Header`, `SearchBar`, `TabBar`, `WordGrid`).
+

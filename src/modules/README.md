@@ -24,3 +24,4 @@ Este diretório contém os módulos de domínio, infraestrutura e apresentação
 
 📖 Para uma explicação completa e aprofundada de cada arquivo, classe e função, consulte o documento principal:
 👉 **[Documentação Completa de Módulos](../../docs/modulos.md)**
+

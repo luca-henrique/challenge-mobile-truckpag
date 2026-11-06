@@ -1,16 +1,15 @@
-import { useEffect } from "react";
-import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-import { QueryErrorResetBoundary } from "@tanstack/react-query";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { StatusBar } from "expo-status-bar";
+import React, { useEffect } from 'react';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { QueryErrorResetBoundary } from '@tanstack/react-query';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import {
   queryClient,
   asyncStoragePersister,
   setupQueryFocusManager,
-} from "./src/core/network/query-client";
-import { ErrorBoundary } from "./src/core/ui/ErrorBoundary";
-import { AuthGate } from "./src/modules/auth/presentation/components/AuthGate";
-import { HomeScreen } from "./src/modules/dictionary/presentation/screens/HomeScreen";
+} from './src/core/network/query-client';
+import { ErrorBoundary } from './src/core/ui/ErrorBoundary';
+import { AppNavigator } from './src/navigation';
 
 export default function App() {
   useEffect(() => {
@@ -30,9 +29,7 @@ export default function App() {
         <QueryErrorResetBoundary>
           {({ reset }) => (
             <ErrorBoundary onReset={reset}>
-              <AuthGate>
-                <HomeScreen />
-              </AuthGate>
+              <AppNavigator />
             </ErrorBoundary>
           )}
         </QueryErrorResetBoundary>
