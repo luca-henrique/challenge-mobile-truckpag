@@ -10,3 +10,4 @@ export type RootNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export type AuthScreenRouteProp = RouteProp<RootStackParamList, 'Auth'>;
 export type HomeScreenRouteProp = RouteProp<RootStackParamList, 'Home'>;
+

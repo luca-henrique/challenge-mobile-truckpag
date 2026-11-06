@@ -38,3 +38,4 @@ export const RootNavigator: React.FC = () => {
     </Stack.Navigator>
   );
 };
+

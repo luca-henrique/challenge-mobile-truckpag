@@ -22,3 +22,4 @@ export const AppNavigator: React.FC = () => {
     </NavigationContainer>
   );
 };
+
