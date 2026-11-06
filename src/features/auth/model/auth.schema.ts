@@ -55,3 +55,4 @@ export function validateRegisterForm(data: RegisterFormData): FormErrors {
 
   return errors;
 }
+
