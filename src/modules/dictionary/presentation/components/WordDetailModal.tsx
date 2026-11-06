@@ -7,8 +7,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   ScrollView,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useWordDetail } from '../hooks/useWordDetail';
 import { useWordStore } from '../state/useWordStore';
 import { useAuthStore } from '../../../auth/presentation/state/useAuthStore';
