@@ -7,6 +7,7 @@ export const LoadingScreen: React.FC = () => {
     <View style={styles.container}>
       <ActivityIndicator size="large" color={tokens.colors.primary} />
       <Text style={styles.loadingText}>Carregando dicionário...</Text>
+      <Text style={styles.subText}>Preparando o vocabulário para você</Text>
     </View>
   );
 };
@@ -21,8 +22,13 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: tokens.spacing.md,
     fontSize: tokens.typography.sm.fontSize,
+    color: tokens.colors.text,
+    fontWeight: '600',
+  },
+  subText: {
+    marginTop: tokens.spacing.xs,
+    fontSize: tokens.typography.xs.fontSize,
     color: tokens.colors.textSecondary,
-    fontWeight: '500',
   },
 });
 

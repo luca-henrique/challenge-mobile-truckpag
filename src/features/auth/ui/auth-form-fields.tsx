@@ -35,7 +35,7 @@ export const AuthFormFields: React.FC<AuthFormFieldsProps> = ({
         <Input
           testID="name-input"
           label="Nome completo"
-          placeholder="Ex: João da Silva"
+          placeholder="Como você prefere ser chamado?"
           value={name}
           onChangeText={onChangeName}
           error={formErrors.name}
@@ -63,7 +63,7 @@ export const AuthFormFields: React.FC<AuthFormFieldsProps> = ({
         inputRef={passwordInputRef}
         testID="password-input"
         label="Senha"
-        placeholder="Mínimo de 4 caracteres"
+        placeholder="Sua senha de acesso (mín. 4 dígitos)"
         value={password}
         onChangeText={onChangePassword}
         error={formErrors.password}

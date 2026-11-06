@@ -12,7 +12,7 @@ export interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChangeText,
-  placeholder = 'Pesquisar termo em inglês...',
+  placeholder = 'Buscar palavra em inglês...',
 }) => {
   return (
     <View style={styles.searchContainer}>

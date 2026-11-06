@@ -64,9 +64,9 @@ export const HomeScreen: React.FC = () => {
   }, [activeTab, words, history, favorites]);
 
   const emptyMessage = useMemo(() => {
-    if (activeTab === 'favorites') return 'Você ainda não favoritou nenhuma palavra.';
-    if (activeTab === 'history') return 'Seu histórico está vazio.';
-    return 'Nenhuma palavra encontrada.';
+    if (activeTab === 'favorites') return 'Você ainda não favoritou nenhuma palavra. Toque no coração para guardá-la aqui.';
+    if (activeTab === 'history') return 'Seu histórico está vazio. As palavras consultadas aparecerão aqui.';
+    return 'Nenhuma palavra encontrada. Tente buscar outro termo ou verifique a digitação.';
   }, [activeTab]);
 
   const tabTitle = activeTab === 'words' ? 'Word list' : activeTab === 'history' ? 'History' : 'Favorites';

@@ -38,8 +38,8 @@ export class ErrorBoundary extends Component<Props, State> {
           <View style={styles.iconCircle}>
             <Ionicons name="warning-outline" size={40} color={tokens.colors.error} />
           </View>
-          <Text style={styles.title}>Ops! Algo deu errado.</Text>
-          <Text style={styles.message}>Ocorreu uma falha inesperada. Você pode tentar restabelecer o estado.</Text>
+          <Text style={styles.title}>Tivemos um contratempo inesperado</Text>
+          <Text style={styles.message}>Não se preocupe, seus dados continuam seguros. Vamos tentar recarregar a tela.</Text>
           {this.state.error && <Text style={styles.errorDetails} numberOfLines={3}>{this.state.error.message}</Text>}
           <TouchableOpacity style={styles.resetButton} onPress={this.handleReset} hitSlop={tokens.touch.hitSlop} accessibilityRole="button">
             <Ionicons name="refresh-outline" size={18} color={tokens.colors.surface} />

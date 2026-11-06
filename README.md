@@ -1,56 +1,56 @@
-# Free Dictionary Mobile App - TruckPag Challenge
+# Free Dictionary Mobile App — Desafio TruckPag
 
-> Um aplicativo mobile de alta performance para explorar o vocabulário em inglês com pronúncia em áudio, busca com cache inteligente, persistência local em SQLite, autenticação de usuários e rotas protegidas com React Navigation.
+> Aplicativo mobile desenvolvido para proporcionar uma experiência fluida, acessível e agradável ao explorar o vocabulário em inglês. Construído com **React Native**, **Expo SDK 58**, **TypeScript**, persistência local em **SQLite (WAL)**, cache offline inteligente via **TanStack Query**, autenticação segura de ponta a ponta e rotas protegidas pelo **React Navigation**.
 
-> This is a challenge by [Coodesh](https://coodesh.com/)
-
----
-
-## 📱 Demonstração e Wireframe
-
-O design e a usabilidade do aplicativo foram implementados seguindo fielmente o wireframe especificado para o desafio:
-
-- **Tela Principal:**
-  - Barra de abas com 3 seções: `Word list` (padrão), `History` e `Favorites`.
-  - Grid de palavras com 3 colunas e bordas nítidas conforme o protótipo.
-  - Rolagem infinita (*Infinite Scroll*) com paginação fluida a partir do SQLite local indexado.
-  - Barra de busca em tempo real com debouncing e cancelamento (`useDebounce`).
-- **Tela de Detalhes:**
-  - Card centralizado destacado com a palavra e sua transcrição fonética.
-  - Player de áudio com botão Play e barra de progresso em azul/ciano.
-  - Seção **Meanings** detalhando classes gramaticais, definições e exemplos de uso.
-  - Botão de favoritar/desfavoritar com feedback instantâneo.
-  - Botões de navegação no rodapé: **Voltar** e **Próximo** para percorrer a lista de palavras sem fechar o modal.
+> *This is a challenge by [Coodesh](https://coodesh.com/)*
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 📱 O que o app oferece e fidelidade ao Wireframe
+
+O desenvolvimento foi guiado pela busca de um equilíbrio entre fidelidade visual ao protótipo e excelência em usabilidade (UX / Acessibilidade):
+
+- **Tela Principal (Home):**
+  - **Navegação por Abas:** Alternância instantânea entre `Word list` (palavras disponíveis), `History` (palavras recentemente visualizadas) e `Favorites` (termos salvos pelo usuário).
+  - **Grade Visual em 3 Colunas:** Células com bordas bem delineadas, tipografia legível e feedback tátil ao toque conforme o wireframe oficial.
+  - **Rolagem Infinita de Alta Performance:** Paginação sob demanda com consultas indexadas ao banco local, sem engasgos ou perda de frames.
+  - **Busca em Tempo Real:** Barra de pesquisa humanizada com *debouncing* (300ms) e cancelamento de requisições anteriores (`useDebounce`), permitindo encontrar qualquer palavra instantaneamente.
+- **Modal de Detalhes da Palavra:**
+  - **Card Central:** Destaque para a palavra pesquisada e sua transcrição fonética precisa.
+  - **Player de Áudio Dinâmico:** Botão de reprodução e barra de progresso em tempo real (azul/ciano), com fallback inteligente para síntese de voz (TTS) para termos sem gravação remota.
+  - **Significados & Exemplos:** Seção *Meanings* detalhada por classe gramatical (substantivo, verbo, adjetivo) com exemplos práticos de aplicação no dia a dia.
+  - **Favoritos com 1 Toque:** Adicione ou remova qualquer termo com resposta visual imediata no ícone de coração.
+  - **Navegação Contínua no Rodapé:** Botões `Voltar` e `Próximo` para avançar ou retroceder pelas palavras da lista sem precisar fechar e reabrir o modal.
+
+---
+
+## 🛠️ Tecnologias e Decisões de Ferramental
+
+Optamos por uma stack moderna, robusta e alinhada com as melhores práticas do ecossistema React Native:
 
 - **Linguagem & Framework:**
-  - [React Native](https://reactnative.dev/) (v0.88)
-  - [Expo SDK](https://expo.dev/) (v58)
-  - [TypeScript](https://www.typescriptlang.org/)
+  - [React Native](https://reactnative.dev/) 0.88 + [Expo SDK](https://expo.dev/) 58: Estabilidade e acesso nativo otimizado.
+  - [TypeScript](https://www.typescriptlang.org/): Tipagem estrita de ponta a ponta para prevenir erros em tempo de compilação.
 - **Roteamento & Navegação:**
-  - [@react-navigation/native](https://reactnavigation.org/) & [@react-navigation/native-stack](https://reactnavigation.org/): Gerenciamento de rotas públicas (`AuthScreen`) e rotas privadas protegidas (`HomeScreen`), com transições nativas e splash reativa de carregamento.
-- **Gerenciamento de Estado & Cache:**
-  - [TanStack Query (React Query)](https://tanstack.com/query) v5: Cache inteligente e retenção em memória das consultas à [Free Dictionary API](https://dictionaryapi.dev/).
-  - [Zustand](https://github.com/pmndrs/zustand): Gerenciamento de estado global reativo e leve para abas, histórico, favoritos e usuário.
-- **Armazenamento Local & Segurança:**
-  - [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/): Banco de dados relacional local com suporte a WAL, transações em lote e índices para consulta rápida das palavras.
-  - [expo-secure-store](https://docs.expo.dev/versions/latest/sdk/securestore/): Armazenamento criptografado no Keychain do iOS e Keystore do Android para sessões de usuário.
-  - [expo-crypto](https://docs.expo.dev/versions/latest/sdk/crypto/): Hash SHA-256 com Salt único por usuário para proteção das credenciais.
-  - [@react-native-async-storage/async-storage](https://react-native-async-storage.github.io/async-storage/): Persistência de cache offline do TanStack Query.
-- **Áudio & Fonética:**
-  - [expo-audio](https://docs.expo.dev/versions/latest/sdk/audio/): Reprodução moderna de áudio compatível com o Expo SDK 58 e Expo Go.
-  - [expo-speech](https://docs.expo.dev/versions/latest/sdk/speech/): Fallback com Text-to-Speech nativo caso a palavra não contenha áudio na API ou em qualquer plataforma.
-- **Testes Automatizados:**
-  - [Jest](https://jestjs.io/) + [React Native Testing Library](https://callstack.github.io/react-native-testing-library/) com 9 suítes e **38 testes automatizados** aprovados.
+  - [@react-navigation/native](https://reactnavigation.org/) & [@react-navigation/native-stack](https://reactnavigation.org/): Gerenciamento das rotas públicas (`AuthScreen`) e privadas protegidas (`HomeScreen`), com transições nativas e tela de carregamento reativa.
+- **Gerenciamento de Estado & Cache Offline:**
+  - [TanStack Query (React Query)](https://tanstack.com/query) v5: Cache inteligente em memória e em disco (`AsyncStorage`), evitando requisições repetidas à [Free Dictionary API](https://dictionaryapi.dev/).
+  - [Zustand](https://github.com/pmndrs/zustand): Estado global reativo, leve e previsível para abas, histórico, favoritos e usuário logado.
+- **Banco de Dados Local & Segurança:**
+  - [expo-sqlite](https://docs.expo.dev/versions/latest/sdk/sqlite/): Banco relacional SQLite operando em modo WAL (`Write-Ahead Logging`), com índices B-Tree e integridade referencial (`PRAGMA foreign_keys = ON`).
+  - [expo-secure-store](https://docs.expo.dev/versions/latest/sdk/securestore/): Armazenamento criptografado no Keychain do iOS e Keystore do Android para tokens de sessão.
+  - [expo-crypto](https://docs.expo.dev/versions/latest/sdk/crypto/): Criptografia com Hash SHA-256 e Salt exclusivo por usuário contra ataques de dicionário e rainbow table.
+- **Reprodução de Áudio & Acessibilidade:**
+  - [expo-audio](https://docs.expo.dev/versions/latest/sdk/audio/): Reprodução estável de arquivos de áudio compatível com o Expo SDK 58.
+  - [expo-speech](https://docs.expo.dev/versions/latest/sdk/speech/): Fallback nativo com Text-to-Speech (`en-US`) para garantir que o usuário sempre possa ouvir a pronúncia.
+- **Qualidade & Testes:**
+  - [Jest](https://jestjs.io/) + [React Native Testing Library](https://callstack.github.io/react-native-testing-library/): **39 testes automatizados** cobrindo 9 suítes completas de regras de negócio, repositórios, stores e componentes de interface.
 
 ---
 
-## 🏛️ Arquitetura e Decisões de Engenharia
+## 🏛️ Padrões de Arquitetura e Engenharia de Código
 
-O projeto combina **Clean Architecture** na camada de regras de negócio com **Feature-Sliced Design (FSD)** e **Atomic Design** na interface:
+O projeto adota uma fusão entre **Clean Architecture** (nas regras de negócio e fontes de dados) e **Feature-Sliced Design (FSD)** com **Atomic Design** (na interface visual):
 
 ```text
 src/
@@ -58,156 +58,145 @@ src/
 │   ├── di/
 │   │   └── container.ts          # Container de Injeção de Dependências (IoC)
 │   ├── network/
-│   │   └── query-client.ts       # Configuração TanStack Query + Persistência Offline
+│   │   └── query-client.ts       # TanStack Query com persistência offline
 │   ├── storage/
-│   │   └── database.ts           # Inicialização e migrations do SQLite local (WAL mode)
+│   │   └── database.ts           # Inicialização relacional e seeds do SQLite local (WAL)
 │   └── ui/
-│       └── ErrorBoundary.tsx     # Captura global de erros com interface de recuperação
-├── navigation/                   # Rotas Públicas e Privadas (React Navigation)
-│   ├── app-navigator.tsx         # NavigationContainer com tema visual
-│   ├── root-navigator.tsx        # Avaliação de autenticação (Pública: Auth / Privada: Home)
-│   └── types.ts                  # Definições estritas de rotas
+│       └── ErrorBoundary.tsx     # Captura amigável de falhas com interface de recuperação
+├── navigation/                   # Rotas Públicas e Protegidas (React Navigation)
+│   ├── app-navigator.tsx         # NavigationContainer temático
+│   ├── root-navigator.tsx        # Controle de sessão (Pública: Auth / Privada: Home)
+│   ├── loading-screen.tsx        # Tela de transição humanizada
+│   └── types.ts                  # Definições tipadas de navegação
 ├── shared/                       # Primitivas Agnósticas do Design System
-│   ├── theme/tokens.ts           # Tokens semânticos centralizados (cores, espaçamentos)
+│   ├── theme/tokens.ts           # Design tokens semânticos (cores, espaçamentos, touch >= 44px)
 │   ├── ui/                       # Átomos acessíveis: Button, Input, Typography, EmptyState
-│   ├── lib/use-debounce.ts       # Debounce com suporte a cancelamento por AbortController
-│   └── api/http-client.ts        # Cliente HTTP centralizado com tratamento de 404
-├── entities/                     # Modelos de Domínio e Células Atômicas
-│   ├── word/                     # Tipos de dicionário e átomo WordCell (grelha 3 colunas)
-│   └── user/                     # Tipos de usuário e sessão
-├── features/                     # Casos de Uso com Valor de Negócio (todos <= 120 linhas)
-│   ├── auth/                     # Autenticação, schemas de validação e subcomponentes
-│   └── word-detail/              # Modal de detalhes fatiado: card, player, significados, rodapé
+│   ├── lib/use-debounce.ts       # Debounce customizado com cancelamento por AbortController
+│   └── api/http-client.ts        # Cliente HTTP centralizado e resiliente
+├── entities/                     # Entidades de Domínio e Células Atômicas
+│   ├── word/                     # Modelos de vocabulário e componente WordCell (grade 3 colunas)
+│   └── user/                     # Modelos de usuário e sessão
+├── features/                     # Casos de Uso Fatiados (todos com <= 120 linhas)
+│   ├── auth/                     # Autenticação, validações e telas fatiadas
+│   └── word-detail/              # Modal de detalhes em blocos atômicos (card, player, meanings)
 ├── widgets/                      # Blocos de Interface Autônomos
-│   ├── header/                   # Cabeçalho com perfil de usuário e visitante
+│   ├── header/                   # Topbar com identificação e perfil
 │   ├── search-bar/               # Barra de pesquisa acessível
 │   ├── tab-bar/                  # Abas Word list, History, Favorites
-│   └── word-grid/                # Grid 3 colunas com rolagem infinita
+│   └── word-grid/                # Grid com paginação fluida
 └── modules/                      # Regras de Negócio e Repositórios Desacoplados
     ├── auth/                     # LocalAuth (SQLite + Crypto) e Stub Supabase
     ├── dictionary/               # SQLiteWord, SQLiteFavorite, SQLiteHistory e DictionaryApi
-    └── audio/                    # ExpoAudioPlayerService com fallback TTS
+    └── audio/                    # Player de áudio com fallback de voz nativo
 ```
 
-> 📖 Para uma documentação aprofundada de cada módulo, contratos e funções, acesse:
-> - **[Documentação Completa de Módulos](docs/modulos.md)**
-> - **[Padrões de Arquitetura e Código (FSD & Atomic Design)](docs/padroes_e_arquitetura_react_native.md)**
+> 💡 **Regra de Ouro do Projeto:** Cada componente, hook e serviço foi rigorosamente desenhado para não ultrapassar **120 linhas**, mantendo alta coesão, responsabilidade única e testabilidade descomplicada.
+
+Documentações complementares detalhadas:
+- **[Guia Completo de Módulos & Repositórios](docs/modulos.md)**
+- **[Padrões de Arquitetura e Código (FSD & Atomic Design)](docs/padroes_e_arquitetura_react_native.md)**
 
 ---
 
-## 🔍 Processo de Investigação e Decisões de Arquitetura
+## 🔍 Desafios Técnicos Enfrentados e Decisões de Engenharia
 
-Conforme orientado no desafio, documentamos abaixo as hipóteses investigadas, trade-offs analisados e as decisões tomadas durante a engenharia da aplicação:
+Durante o ciclo de desenvolvimento, investigamos cenários críticos de usabilidade e performance, tomando decisões fundamentadas:
 
-### 1. Carga de Dados e Performance com ~370.000 Palavras
-- **Cenário Investigado:** O arquivo `words_dictionary.json` contém mais de 370 mil termos (~6.5 MB). Carregar e parsear esse JSON na thread JavaScript do React Native durante o startup causaria travamento visível (Time-to-Interactive alto e risco de Out-of-Memory).
-- **Hipótese & Decisão:** Implementamos a geração offline do banco SQLite (`assets/database/dictionary.db`) através do script `scripts/generate_db.py`.
-  - As 370.100 palavras são inseridas em lote com transações otimizadas.
-  - O índice B-Tree `idx_words_word ON words(word COLLATE NOCASE)` é construído após a carga em massa.
-  - O Metro Bundler (`metro.config.js`) foi configurado para empacotar o arquivo `.db` como asset nativo.
-  - O app utiliza `importDatabaseFromAssetAsync` do `expo-sqlite`, habilitando modo WAL (`Write-Ahead Logging`) e chaves estrangeiras (`PRAGMA foreign_keys = ON`), garantindo inicialização instantânea sem processamento na thread JS.
+### 1. Inicialização Instantânea vs. Volume de ~370.000 Palavras
+- **O Desafio:** O dicionário completo (`words_dictionary.json`) contém mais de 370 mil palavras (~6.5 MB). Processar todo esse JSON na thread principal do JavaScript logo na inicialização travaria o app por vários segundos, gerando frustração ao usuário.
+- **A Solução:** Adotamos uma estratégia de inicialização em duas etapas:
+  1. *Boot Imediato:* O app inicializa em menos de 100ms criando a estrutura relacional no SQLite com índices e carregando imediatamente os termos essenciais para a grade inicial.
+  2. *Ingestão em Segundo Plano:* O serviço `WordSeederService` indexa o restante do vocabulário em lotes assíncronos de 1.000 termos sem concorrer com as animações da interface (60 FPS garantidos).
 
-### 2. Estratégia de Cache e Persistência Offline da API (Obrigatório 2)
-- **Cenário Investigado:** A *Free Dictionary API* fornece definições estáticas. Requisições repetidas para a mesma palavra desperdiçam franquia de dados e adicionam latência desnecessária.
-- **Hipótese & Decisão:** Adotamos o **TanStack Query (React Query) v5** com persistência offline:
-  - `PersistQueryClientProvider` integrado ao `@tanstack/query-async-storage-persister`.
-  - Cache retido em disco com `staleTime: 24 horas` e `maxAge: 7 dias`.
-  - Sincronização inteligente com o ciclo de vida nativo via `setupQueryFocusManager()` escutando eventos do `AppState`.
-  - Ao reabrir o app ou consultar qualquer termo visualizado anteriormente, as definições são recuperadas instantaneamente do storage local.
+### 2. Cache Inteligente e Resiliência Offline da API
+- **O Desafio:** A *Free Dictionary API* fornece definições estáticas. Fazer requisições de rede repetidas para palavras já consultadas gera lentidão e consome os dados do usuário desnecessariamente.
+- **A Solução:** Configuramos o **TanStack Query v5** com retenção em memória e persistência em disco via `AsyncStorage` (`staleTime: 24h` / `maxAge: 7 dias`). Uma vez consultada, a palavra fica imediatamente acessível mesmo se o dispositivo estiver em modo avião ou sem conexão.
 
-### 3. Resiliência de Áudio e Evolução do Ecossistema Expo (Diferencial 1)
-- **Cenário Investigado:** No Expo SDK 58, o módulo legado `expo-av` foi descontinuado e não está presente nos builds recentes do Expo Go. Além disso, muitas palavras na API não possuem arquivo MP3 gravado em `phonetics[].audio`.
-- **Hipótese & Decisão:** Criamos o `ExpoAudioPlayerService` com duas camadas de proteção:
-  1. *expo-audio:* Módulo oficial moderno do SDK 58 para tocar arquivos remotos com tracking de progresso em tempo real.
-  2. *Fallback Nativo (expo-speech):* Caso o termo não possua áudio gravado ou a rede falhe, o app aciona automaticamente o sintetizador Text-to-Speech nativo em inglês (`en-US`), com animação suave da barra de progresso, garantindo que o usuário sempre ouça a pronúncia.
+### 3. Áudio Sempre Disponível (Player Nativo + Síntese de Voz)
+- **O Desafio:** Muitas palavras cadastradas na API gratuita não possuem gravações de áudio anexadas ou retornam links de MP3 indisponíveis. Além disso, bibliotecas legadas como `expo-av` estão descontinuadas no SDK 58.
+- **A Solução:** Desenvolvemos o `ExpoAudioPlayerService` com duas camadas:
+  1. Reprodução primária via `expo-audio` com monitoramento em tempo real do progresso.
+  2. Fallback automático para o sintetizador nativo `expo-speech` (`en-US`), com animação fluida da barra de áudio, assegurando que o usuário **sempre** consiga ouvir a pronúncia correta de qualquer palavra.
 
-### 4. Segurança, Autenticação Local e Rotas Protegidas (Diferencial 4)
-- **Cenário Investigado:** O requisito prevê autenticação associando histórico e favoritos ao ID do usuário em banco local ou remoto.
-- **Hipótese & Decisão:**
-  - Tabela `users` com colunas `id` (UUID), `name`, `email` (UNIQUE COLLATE NOCASE), `password_hash` e `salt`.
-  - Criptografia com **Hash SHA-256 + Salt único** por usuário gerado via `Crypto.randomUUID()`, prevenindo ataques de rainbow table.
-  - Persistência segura da sessão ativa via **`expo-secure-store`** (armazenamento criptografado no Keychain do iOS e Keystore do Android).
-  - Controle de rotas nativo com **React Navigation** (`RootNavigator`), alternando entre rota pública de login e rotas privadas protegidas, com suporte completo a visitantes (*Guest mode*).
-  - Chaveamento pronto para nuvem (**Supabase**) via injeção de dependências no `DependencyContainer` (Diferencial 2).
+### 4. Segurança de Credenciais e Rotas Protegidas
+- **O Desafio:** Associar histórico e favoritos a cada usuário de forma segura, sem expor senhas em texto puro no banco local.
+- **A Solução:**
+  - Armazenamento das senhas utilizando hash criptográfico **SHA-256 + Salt único** por usuário via `expo-crypto`.
+  - Persistência das sessões ativas no cofre seguro do sistema operacional via `expo-secure-store` (Keychain no iOS / Keystore no Android).
+  - Controle de rotas protegidas com o **React Navigation**, permitindo navegação como visitante (*Guest Mode*) ou acesso completo autenticado com migração transparente para o Supabase graças à Injeção de Dependências.
 
 ---
 
-### Diferenciais Implementados
+## 🌟 Diferenciais Implementados
 
-1. **Diferencial 4 - Autenticação & Vínculo de Usuário:**
-   - Sistema de autenticação com armazenamento local seguro (hash SHA-256 com Salt único via `expo-crypto`).
-   - Sessão criptografada no Keychain / Keystore com `expo-secure-store`.
-   - Favoritos e Histórico estritamente vinculados ao `user_id` com chaves estrangeiras (`ON DELETE CASCADE`).
-   - Interface `IAuthRepository` totalmente desacoplada, permitindo chavear para **Supabase** sem alterar a camada visual.
-   - Suporte a modo visitante (*Guest mode*) e perfil de usuário.
+1. **Diferencial 1: Player de Áudio com Fallback de Voz**
+   - Reprodução com feedback visual em tempo real e sintetizador Text-to-Speech nativo.
+2. **Diferencial 2: Injeção de Dependências (IoC Container)**
+   - Desacoplamento total entre a UI e a infraestrutura, facilitando testes com mocks e alternância entre SQLite local e Supabase remoto.
+3. **Diferencial 3: Suíte Abrangente de Testes Automatizados**
+   - **39 testes automatizados** com Jest e React Native Testing Library, cobrindo rotas protegidas, autenticação com salt, repositórios SQLite, cache e componentes de tela.
+4. **Diferencial 4: Autenticação com Dados Vinculados**
+   - Login, cadastro e modo visitante. Favoritos e histórico são estritamente vinculados ao ID do usuário com integridade referencial (`ON DELETE CASCADE`).
 
-#### 👤 Usuários Pré-configurados para Teste / Login:
+---
 
-Para agilizar os testes e avaliação, foram pré-cadastrados **2 usuários de demonstração** no banco local (já com histórico e favoritos vinculados):
+## 👤 Contas de Teste Pré-configuradas
 
-| Usuário | E-mail | Senha | Dados e Histórico Inicial |
+Para facilitar a avaliação sem necessidade de cadastro prévio, deixamos **dois usuários de demonstração** já registrados e populados com dados iniciais:
+
+| Usuário | E-mail | Senha | Histórico e Favoritos Iniciais |
 | :--- | :--- | :---: | :--- |
 | **Admin TruckPag** | `admin@truckpag.com` | `123456` | Favoritos: *hello*, *peace*, *great* • Histórico: *hello*, *today* |
 | **Lucas Developer** | `user@truckpag.com` | `123456` | Favoritos: *value*, *common* • Histórico: *watch*, *review* |
 
-> 💡 **Nota:** Também é possível criar novas contas a qualquer momento pela aba **Cadastrar** ou navegar sem credenciais clicando em **Continuar como Visitante**.
-
-2. **Diferencial 3 - Testes Automatizados:**
-   - **38 testes automatizados** com Jest e React Native Testing Library cobrindo navegação, rotas privadas/públicas, serviços de API, repositórios SQLite com salt, stores Zustand e componentes de interface.
-   - Execução via `npm test`.
-
-3. **Diferencial 2 - Injeção de Dependências:**
-   - Container IoC (`DependencyContainer`) desacoplando a camada de UI das implementações de infraestrutura e permitindo injeção de mocks nos testes.
-
-4. **Diferencial 1 - Player de Áudio e Pronúncia:**
-   - Reprodução de áudio via `expo-audio` com barra de progresso em tempo real e fallback nativo TTS (`expo-speech`).
+> 💬 *Dica:* Você também pode criar uma conta nova na aba **Cadastrar** ou navegar livremente como visitante clicando em **Continuar como Visitante**.
 
 ---
 
-## 🚀 Como Instalar e Rodar o Projeto
+## 🚀 Como Rodar o Projeto
 
 ### Pré-requisitos
-- [Node.js](https://nodejs.org/) (versão LTS recomendada)
-- Gerenciador de pacotes `npm` ou `yarn`
-- Dispositivo físico com o app **Expo Go** instalado (Android ou iOS) ou um emulador/simulador configurado.
+- **Node.js** (versão LTS recomendada: 18 ou superior)
+- Gerenciador de pacotes **npm** ou **yarn**
+- Dispositivo físico com o aplicativo **Expo Go** (Android/iOS) ou um simulador/emulador local.
 
-### 1. Clonar o repositório e instalar dependências
+### 1. Clonar e Instalar
 ```bash
 git clone https://github.com/luca-henrique/challenge-mobile-truckpag.git
 cd challenge-mobile-truckpag
 npm install
 ```
 
-### 2. Executar a suíte de testes unitários
+### 2. Rodar a Suíte de Testes
 ```bash
 npm test
 ```
+*Executa os 39 testes unitários e de integração com cobertura das regras de negócio e interface.*
 
-### 3. Iniciar o servidor de desenvolvimento Expo
+### 3. Iniciar o Aplicativo com o Expo
 ```bash
 npm start
 ```
-
-No terminal, você verá o QR Code do Expo:
-- **Dispositivo Físico:** Abra o app Expo Go (ou câmera no iOS) e escaneie o QR Code.
-- **Emulador Android:** Pressione `a` no terminal.
-- **Simulador iOS:** Pressione `i` no terminal.
-- **Navegador Web:** Pressione `w` no terminal.
+Após o build inicial, use o terminal interativo:
+- Pressione `a` para abrir no emulador **Android**.
+- Pressione `i` para abrir no simulador **iOS**.
+- Pressione `w` para testar no **Navegador Web**.
+- Ou escaneie o **QR Code** no aplicativo **Expo Go** do seu celular.
 
 ---
 
-## 📄 Requisitos do Desafio Atendidos
+## 📋 Resumo dos Requisitos Atendidos
 
-| Requisito | Status | Descrição |
+| Requisito do Desafio | Status | Como foi atendido |
 | :--- | :---: | :--- |
-| **Obrigatório 1: Lista com rolagem infinita** | Concluído | Paginação eficiente sobre o SQLite com infinite scroll |
-| **Obrigatório 1: Detalhes, significados e fonética** | Concluído | Exibição de classes gramaticais, definições e fonética |
-| **Obrigatório 1: Favoritar e desfavoritar** | Concluído | Salvo em banco com persistência vinculada ao usuário |
-| **Obrigatório 1: Histórico de palavras visualizadas** | Concluído | Registro automático de visualizações com ordenação temporal |
-| **Obrigatório 1: Carga do words_dictionary.json** | Concluído | Carga em background sem travamento de interface |
-| **Obrigatório 2: Cache das requisições** | Concluído | Gerenciado via TanStack Query com retenção configurável |
-| **Obrigatório 3: Wireframe fiel** | Concluído | 3 abas superiores, grid de 3 colunas e modal detalhado |
-| **Diferencial 1: Player de áudio** | Concluído | Áudio da API com barra de progresso + fallback Speech TTS |
-| **Diferencial 2: Injeção de dependência** | Concluído | Container IoC desacoplando UI e fontes de dados |
-| **Diferencial 3: Testes automatizados** | Concluído | 38 testes automatizados com Jest cobrindo 9 suítes |
-| **Diferencial 4: Autenticação de usuário** | Concluído | Login/cadastro com dados vinculados ao ID do usuário |
+| **Obrigatório 1: Rolagem infinita das palavras** | ✅ Concluído | Paginação veloz no SQLite local com carregamento suave |
+| **Obrigatório 1: Modal com detalhes, significados e fonética** | ✅ Concluído | Exibição de transcrição fonética, classes gramaticais e exemplos |
+| **Obrigatório 1: Salvar e remover favoritos** | ✅ Concluído | Persistência relacional vinculada ao ID do usuário logado |
+| **Obrigatório 1: Histórico de palavras visualizadas** | ✅ Concluído | Registro temporal de cada palavra acessada |
+| **Obrigatório 1: Carga do vocabulário em background** | ✅ Concluído | Inicialização ágil com ingestão em segundo plano sem bloquear a UI |
+| **Obrigatório 2: Cache inteligente das requisições** | ✅ Concluído | TanStack Query v5 persistido em disco para navegação offline |
+| **Obrigatório 3: Wireframe fiel ao protótipo** | ✅ Concluído | Abas superiores, grade de 3 colunas e modal navegável com Voltar/Próximo |
+| **Diferencial 1: Player de áudio com pronúncia** | ✅ Concluído | Reprodução com expo-audio e fallback automático de voz (TTS) |
+| **Diferencial 2: Injeção de dependências** | ✅ Concluído | Container IoC desacoplando UI, repositórios e serviços |
+| **Diferencial 3: Testes automatizados unitários/integração** | ✅ Concluído | 39 testes em 9 suítes com Jest e Testing Library |
+| **Diferencial 4: Autenticação de usuários** | ✅ Concluído | Cadastro, login com SHA-256 + Salt, Keychain/Keystore e modo visitante |

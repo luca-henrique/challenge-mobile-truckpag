@@ -18,7 +18,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
         <Ionicons name="book-outline" size={32} color={tokens.colors.primary} />
       </View>
       <Text style={styles.title}>Free Dictionary</Text>
-      <Text style={styles.subtitle}>Mobile Challenge TruckPag</Text>
+      <Text style={styles.subtitle}>Aprenda e explore o vocabulário em inglês</Text>
 
       <View style={styles.tabContainer}>
         <TouchableOpacity

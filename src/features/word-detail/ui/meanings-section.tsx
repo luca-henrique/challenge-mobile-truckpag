@@ -21,14 +21,14 @@ export const MeaningsSection: React.FC<MeaningsSectionProps> = ({
       {isLoading && (
         <View style={styles.centerContainer}>
           <ActivityIndicator size="small" color={tokens.colors.primary} />
-          <Text style={styles.infoText}>Buscando definições...</Text>
+          <Text style={styles.infoText}>Consultando o dicionário...</Text>
         </View>
       )}
 
       {isError && (
         <View style={styles.centerContainer}>
           <Text style={styles.errorText}>
-            Não foi possível carregar as definições. Verifique a conexão.
+            Não conseguimos buscar os significados agora. Verifique a sua conexão com a internet.
           </Text>
         </View>
       )}
@@ -44,11 +44,11 @@ export const MeaningsSection: React.FC<MeaningsSectionProps> = ({
                     {meaning.partOfSpeech.charAt(0).toUpperCase() + meaning.partOfSpeech.slice(1)}
                   </Text>
                   {' - '}
-                  {firstDef ? firstDef.definition : 'Sem definição disponível.'}
+                  {firstDef ? firstDef.definition : 'Definição não catalogada.'}
                 </Text>
                 {firstDef?.example && (
                   <Text style={styles.exampleText}>
-                    Exemplo: "{firstDef.example}"
+                    Exemplo prático: "{firstDef.example}"
                   </Text>
                 )}
               </View>
@@ -58,7 +58,7 @@ export const MeaningsSection: React.FC<MeaningsSectionProps> = ({
       ) : null}
 
       {!isLoading && !isError && (!meanings || meanings.length === 0) && (
-        <Text style={styles.infoText}>Nenhuma definição detalhada encontrada.</Text>
+        <Text style={styles.infoText}>Ainda não temos definições cadastradas para esta palavra.</Text>
       )}
     </View>
   );

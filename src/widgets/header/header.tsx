@@ -21,7 +21,7 @@ export const Header: React.FC<HeaderProps> = ({
     <View style={styles.header}>
       <View>
         <Text style={styles.appTitle}>Free Dictionary</Text>
-        <Text style={styles.appSubtitle}>Mobile Challenge TruckPag</Text>
+        <Text style={styles.appSubtitle}>Seu vocabulário em inglês</Text>
       </View>
 
       <TouchableOpacity
