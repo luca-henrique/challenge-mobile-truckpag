@@ -30,96 +30,34 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   render() {
-    if (this.state.hasError) {
-      return (
-        <SafeAreaView style={styles.container}>
-          <View style={styles.content}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="warning-outline" size={40} color={tokens.colors.error} />
-            </View>
-            <Text style={styles.title}>Ops! Algo deu errado.</Text>
-            <Text style={styles.message}>
-              Ocorreu uma falha inesperada na aplicação. Você pode tentar restabelecer o estado.
-            </Text>
-            {this.state.error && (
-              <Text style={styles.errorDetails} numberOfLines={3}>
-                {this.state.error.message}
-              </Text>
-            )}
-            <TouchableOpacity
-              style={styles.resetButton}
-              onPress={this.handleReset}
-              hitSlop={tokens.touch.hitSlop}
-              accessibilityRole="button"
-            >
-              <Ionicons name="refresh-outline" size={18} color={tokens.colors.surface} />
-              <Text style={styles.resetButtonText}>Tentar Novamente</Text>
-            </TouchableOpacity>
+    if (!this.state.hasError) return this.props.children;
+
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <View style={styles.iconCircle}>
+            <Ionicons name="warning-outline" size={40} color={tokens.colors.error} />
           </View>
-        </SafeAreaView>
-      );
-    }
-    return this.props.children;
+          <Text style={styles.title}>Ops! Algo deu errado.</Text>
+          <Text style={styles.message}>Ocorreu uma falha inesperada. Você pode tentar restabelecer o estado.</Text>
+          {this.state.error && <Text style={styles.errorDetails} numberOfLines={3}>{this.state.error.message}</Text>}
+          <TouchableOpacity style={styles.resetButton} onPress={this.handleReset} hitSlop={tokens.touch.hitSlop} accessibilityRole="button">
+            <Ionicons name="refresh-outline" size={18} color={tokens.colors.surface} />
+            <Text style={styles.resetButtonText}>Tentar Novamente</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: tokens.colors.surface,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: tokens.spacing.xxl,
-  },
-  content: {
-    alignItems: 'center',
-    maxWidth: 360,
-  },
-  iconCircle: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: tokens.colors.errorLight,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: tokens.spacing.lg,
-  },
-  title: {
-    fontSize: tokens.typography.xl.fontSize,
-    fontWeight: '700',
-    color: tokens.colors.text,
-    marginBottom: tokens.spacing.sm,
-    textAlign: 'center',
-  },
-  message: {
-    fontSize: tokens.typography.sm.fontSize,
-    color: tokens.colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: tokens.spacing.lg,
-  },
-  errorDetails: {
-    fontSize: tokens.typography.xs.fontSize,
-    color: tokens.colors.error,
-    backgroundColor: tokens.colors.errorLight,
-    padding: tokens.spacing.sm,
-    borderRadius: tokens.radius.md,
-    marginBottom: tokens.spacing.xl,
-    width: '100%',
-    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
-  },
-  resetButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: tokens.colors.primary,
-    paddingVertical: tokens.spacing.md,
-    paddingHorizontal: tokens.spacing.xxl,
-    borderRadius: tokens.radius.md,
-    gap: tokens.spacing.sm,
-    minHeight: tokens.touch.minTarget,
-  },
-  resetButtonText: {
-    color: tokens.colors.surface,
-    fontSize: tokens.typography.sm.fontSize,
-    fontWeight: '600',
-  },
+  container: { flex: 1, backgroundColor: tokens.colors.surface, justifyContent: 'center', alignItems: 'center', padding: tokens.spacing.xxl },
+  content: { alignItems: 'center', maxWidth: 360 },
+  iconCircle: { width: 72, height: 72, borderRadius: 36, backgroundColor: tokens.colors.errorLight, justifyContent: 'center', alignItems: 'center', marginBottom: tokens.spacing.lg },
+  title: { fontSize: tokens.typography.xl.fontSize, fontWeight: '700', color: tokens.colors.text, marginBottom: tokens.spacing.sm, textAlign: 'center' },
+  message: { fontSize: tokens.typography.sm.fontSize, color: tokens.colors.textSecondary, textAlign: 'center', marginBottom: tokens.spacing.lg },
+  errorDetails: { fontSize: tokens.typography.xs.fontSize, color: tokens.colors.error, backgroundColor: tokens.colors.errorLight, padding: tokens.spacing.sm, borderRadius: tokens.radius.md, marginBottom: tokens.spacing.xl, width: '100%', fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace' },
+  resetButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: tokens.colors.primary, paddingVertical: tokens.spacing.md, paddingHorizontal: tokens.spacing.xxl, borderRadius: tokens.radius.md, gap: tokens.spacing.sm, minHeight: tokens.touch.minTarget },
+  resetButtonText: { color: tokens.colors.surface, fontSize: tokens.typography.sm.fontSize, fontWeight: '600' },
 });
