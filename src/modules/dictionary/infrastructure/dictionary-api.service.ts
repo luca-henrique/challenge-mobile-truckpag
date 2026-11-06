@@ -1,5 +1,6 @@
 import { IDictionaryService } from '../domain/services/dictionary.service.interface';
 import { WordDetail } from '../domain/entities/dictionary-word';
+import { httpClient, HttpClientError } from '../../../shared/api/http-client';
 
 export class DictionaryApiService implements IDictionaryService {
   private readonly baseUrl = 'https://api.dictionaryapi.dev/api/v2/entries/en';
@@ -9,17 +10,10 @@ export class DictionaryApiService implements IDictionaryService {
     if (!cleanWord) return null;
 
     try {
-      const response = await fetch(`${this.baseUrl}/${encodeURIComponent(cleanWord)}`);
+      const data = await httpClient<any[]>(`${this.baseUrl}/${encodeURIComponent(cleanWord)}`, {
+        timeoutMs: 8000,
+      });
 
-      if (response.status === 404) {
-        return null;
-      }
-
-      if (!response.ok) {
-        throw new Error(`Erro na API do Dicionário: status ${response.status}`);
-      }
-
-      const data = await response.json();
       if (!Array.isArray(data) || data.length === 0) {
         return null;
       }
@@ -49,8 +43,8 @@ export class DictionaryApiService implements IDictionaryService {
       };
 
       return wordDetail;
-    } catch (err: any) {
-      if (err.message && err.message.includes('404')) {
+    } catch (err: unknown) {
+      if (err instanceof HttpClientError && err.status === 404) {
         return null;
       }
       throw err;
