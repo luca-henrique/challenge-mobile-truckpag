@@ -130,10 +130,29 @@ describe('SqliteAuthRepository (LocalAuthRepository) Unit Tests', () => {
       created_at: '2026-11-06T00:00:00.000Z',
     });
 
-    const user = await repository.signIn('admin@truckpag.com', '123456');
+    const user = await repository.signIn('Admin@TruckPag.com', '123456');
 
     expect(user.id).toBe('user-admin-truckpag');
     expect(user.name).toBe('Admin TruckPag');
     expect(user.email).toBe('admin@truckpag.com');
+  });
+
+  it('deve realizar login mesmo com hash legado sem salt (compatibilidade retroativa)', async () => {
+    const rawHash = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      '123456'
+    );
+
+    mockDb.getFirstAsync.mockResolvedValueOnce({
+      id: 'legacy-user-1',
+      name: 'Legacy User',
+      email: 'legacy@truckpag.com',
+      password_hash: rawHash,
+      salt: null,
+      created_at: '2026-11-06T00:00:00.000Z',
+    });
+
+    const user = await repository.signIn('legacy@truckpag.com', '123456');
+    expect(user.id).toBe('legacy-user-1');
   });
 });

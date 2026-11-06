@@ -44,7 +44,7 @@ Optamos por uma stack moderna, robusta e alinhada com as melhores práticas do e
   - [expo-audio](https://docs.expo.dev/versions/latest/sdk/audio/): Reprodução estável de arquivos de áudio compatível com o Expo SDK 58.
   - [expo-speech](https://docs.expo.dev/versions/latest/sdk/speech/): Fallback nativo com Text-to-Speech (`en-US`) para garantir que o usuário sempre possa ouvir a pronúncia.
 - **Qualidade & Testes:**
-  - [Jest](https://jestjs.io/) + [React Native Testing Library](https://callstack.github.io/react-native-testing-library/): **39 testes automatizados** cobrindo 9 suítes completas de regras de negócio, repositórios, stores e componentes de interface.
+  - [Jest](https://jestjs.io/) + [React Native Testing Library](https://callstack.github.io/react-native-testing-library/): **40 testes automatizados** cobrindo 9 suítes completas de regras de negócio, repositórios, stores e componentes de interface.
 
 ---
 
@@ -134,7 +134,7 @@ Durante o ciclo de desenvolvimento, investigamos cenários críticos de usabilid
 2. **Diferencial 2: Injeção de Dependências (IoC Container)**
    - Desacoplamento total entre a UI e a infraestrutura, facilitando testes com mocks e alternância entre SQLite local e Supabase remoto.
 3. **Diferencial 3: Suíte Abrangente de Testes Automatizados**
-   - **39 testes automatizados** com Jest e React Native Testing Library, cobrindo rotas protegidas, autenticação com salt, repositórios SQLite, cache e componentes de tela.
+   - **40 testes automatizados** com Jest e React Native Testing Library, cobrindo rotas protegidas, autenticação com salt, repositórios SQLite, cache e componentes de tela.
 4. **Diferencial 4: Autenticação com Dados Vinculados**
    - Login, cadastro e modo visitante. Favoritos e histórico são estritamente vinculados ao ID do usuário com integridade referencial (`ON DELETE CASCADE`).
 
@@ -171,7 +171,7 @@ npm install
 ```bash
 npm test
 ```
-*Executa os 39 testes unitários e de integração com cobertura das regras de negócio e interface.*
+*Executa os 40 testes unitários e de integração com cobertura das regras de negócio e interface.*
 
 ### 3. Iniciar o Aplicativo com o Expo
 ```bash
@@ -198,5 +198,5 @@ Após o build inicial, use o terminal interativo:
 | **Obrigatório 3: Wireframe fiel ao protótipo** | ✅ Concluído | Abas superiores, grade de 3 colunas e modal navegável com Voltar/Próximo |
 | **Diferencial 1: Player de áudio com pronúncia** | ✅ Concluído | Reprodução com expo-audio e fallback automático de voz (TTS) |
 | **Diferencial 2: Injeção de dependências** | ✅ Concluído | Container IoC desacoplando UI, repositórios e serviços |
-| **Diferencial 3: Testes automatizados unitários/integração** | ✅ Concluído | 39 testes em 9 suítes com Jest e Testing Library |
+| **Diferencial 3: Testes automatizados unitários/integração** | ✅ Concluído | 40 testes em 9 suítes com Jest e Testing Library |
 | **Diferencial 4: Autenticação de usuários** | ✅ Concluído | Cadastro, login com SHA-256 + Salt, Keychain/Keystore e modo visitante |
