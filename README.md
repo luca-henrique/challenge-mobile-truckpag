@@ -68,8 +68,41 @@ src/
     │   └── presentation/         # Hooks (useWordDetail), Zustand Store, Telas e Componentes
     └── audio/                    # Módulo de Áudio (Diferencial 1)
         ├── domain/               # IAudioPlayerService
-        └── infrastructure/       # Implementação com expo-av e expo-speech
+        └── infrastructure/       # Implementação com expo-audio e expo-speech
 ```
+
+---
+
+## 🔍 Processo de Investigação e Decisões de Arquitetura
+
+Conforme orientado no desafio, documentamos abaixo as hipóteses investigadas, trade-offs analisados e as decisões tomadas durante a engenharia da aplicação:
+
+### 1. Carga de Dados e Performance com ~370.000 Palavras
+- **Cenário Investigado:** O arquivo `words_dictionary.json` contém mais de 370 mil termos (~6.5 MB). Carregar esse JSON na memória da thread JavaScript do React Native durante o startup causaria travamento visível (Time-to-Interactive alto e risco de Out-of-Memory em aparelhos mais modestos).
+- **Hipótese & Decisão:** Implementamos uma estratégia em dois níveis via `WordSeederService`:
+  1. *Seed Prioritário Imediato:* Carrega uma lista inicial instantânea (incluindo as palavras presentes no wireframe oficial: `hello`, `today`, `great`, etc.), permitindo que a tela principal abra em **menos de 50ms**.
+  2. *Batch Insert em Segundo Plano:* O restante das 370.000 palavras é inserido no SQLite em transações em lotes de 1.000 registros (`withTransactionAsync`), liberando fatias de tempo para o event loop do JS via pausas controladas, com modo WAL (`Write-Ahead Logging`) e índices B-Tree ativos.
+
+### 2. Estratégia de Cache da API (Obrigatório 2)
+- **Cenário Investigado:** A *Free Dictionary API* fornece definições estáticas (o significado de uma palavra não muda no tempo). Requisições repetidas para a mesma palavra desperdiçam franquia de dados do usuário e adicionam latência de rede.
+- **Hipótese & Decisão:** Adotamos o **TanStack Query (React Query) v5**:
+  - `staleTime: 24 horas` e `gcTime: 7 dias`.
+  - Ao abrir uma palavra já consultada (seja pela lista, histórico ou favoritos), os dados são entregues instantaneamente do cache em memória sem emitir novas requisições HTTP.
+
+### 3. Resiliência de Áudio e Evolução do Ecossistema Expo (Diferencial 1)
+- **Cenário Investigado:** No Expo SDK 58, o módulo legado `expo-av` foi descontinuado e não está presente nos builds recentes do Expo Go. Além disso, muitas palavras na API não possuem arquivo MP3 gravado em `phonetics[].audio`.
+- **Hipótese & Decisão:** Criamos o `ExpoAudioPlayerService` com duas camadas de proteção:
+  1. *expo-audio:* Módulo oficial moderno do SDK 58 para tocar arquivos remotos com tracking de progresso em tempo real.
+  2. *Fallback Nativo (expo-speech):* Caso o termo não possua áudio gravado ou a rede falhe, o app aciona automaticamente o sintetizador Text-to-Speech nativo em inglês (`en-US`), com animação sintética da barra de progresso, garantindo que o usuário sempre ouça a pronúncia.
+
+### 4. Isolamento por Usuário e Preparação para Nuvem (Diferencial 4)
+- **Cenário Investigado:** O requisito prevê autenticação local ou remota associando histórico e favoritos ao ID do usuário.
+- **Hipótese & Decisão:**
+  - Modelamos o contrato `IAuthRepository` de forma pura.
+  - Implementamos a persistência local em SQLite com hash SHA-256 (`expo-crypto`) e sessão em `AsyncStorage`.
+  - Criamos o stub `SupabaseAuthRepository` pronto para receber chaves de produção, permitindo transicionar de local para nuvem simplesmente alterando o registro no `DependencyContainer` (Diferencial 2).
+
+---
 
 ### Diferenciais Implementados
 
