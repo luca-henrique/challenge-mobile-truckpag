@@ -24,17 +24,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   clearError: () => set({ error: null }),
 
   initSession: async () => {
+    const safetyTimer = setTimeout(() => {
+      if (get().isLoading) set({ isLoading: false });
+    }, 1500);
+
     try {
       set({ isLoading: true, error: null });
       const current = await container.authRepository.getCurrentUser();
-      if (current) {
-        set({ user: current, isGuest: false, isLoading: false });
-      } else {
-        // Inicializa como guest por padrão para permitir explorar imediatamente se desejado
-        set({ user: null, isGuest: false, isLoading: false });
-      }
+      set({ user: current, isGuest: false, isLoading: false });
     } catch (err: any) {
       set({ error: err.message || 'Erro ao carregar sessão', isLoading: false });
+    } finally {
+      clearTimeout(safetyTimer);
+      set({ isLoading: false });
     }
   },
 

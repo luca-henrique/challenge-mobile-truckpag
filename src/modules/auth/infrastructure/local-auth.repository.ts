@@ -83,10 +83,13 @@ export class LocalAuthRepository implements IAuthRepository {
 
   async getCurrentUser(): Promise<User | null> {
     try {
-      const db = await getDatabase();
-      const activeId = await SecureStore.getItemAsync(SESSION_KEY);
+      const activeId = await Promise.race([
+        SecureStore.getItemAsync(SESSION_KEY),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 1000)),
+      ]);
       if (!activeId) return null;
 
+      const db = await getDatabase();
       const userRow = await db.getFirstAsync<UserRow>('SELECT * FROM users WHERE id = ?', [activeId]);
       if (!userRow) {
         try { await SecureStore.deleteItemAsync(SESSION_KEY); } catch {}

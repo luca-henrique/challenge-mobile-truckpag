@@ -1,10 +1,10 @@
 import * as SQLite from 'expo-sqlite';
 
 let dbInstance: SQLite.SQLiteDatabase | null = null;
+let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 const DATABASE_NAME = 'truckpag_dictionary.db';
 
 export async function importPrepopulatedDatabase(): Promise<void> {
-  // Inicialização determinística e instantânea gerenciada via DDL e WordSeederService
   return Promise.resolve();
 }
 
@@ -52,9 +52,13 @@ export async function initDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
   `);
 
   try {
-    await db.execAsync('ALTER TABLE users ADD COLUMN salt TEXT;');
+    const columns = await db.getAllAsync<{ name: string }>('PRAGMA table_info(users);');
+    const hasSalt = Array.isArray(columns) && columns.some((col) => col.name === 'salt');
+    if (!hasSalt) {
+      await db.execAsync('ALTER TABLE users ADD COLUMN salt TEXT;');
+    }
   } catch {
-    // Coluna salt já existe no schema local
+    // Ignora se não for possível consultar table_info
   }
 
   await db.execAsync(`
@@ -78,14 +82,22 @@ export async function initDatabase(db: SQLite.SQLiteDatabase): Promise<void> {
 }
 
 export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
-  if (!dbInstance) {
-    await importPrepopulatedDatabase();
-    dbInstance = await SQLite.openDatabaseAsync(DATABASE_NAME);
-    await initDatabase(dbInstance);
+  if (dbInstance) return dbInstance;
+  if (!dbPromise) {
+    dbPromise = (async () => {
+      const db = await SQLite.openDatabaseAsync(DATABASE_NAME);
+      await initDatabase(db);
+      dbInstance = db;
+      return db;
+    })().catch((err) => {
+      dbPromise = null;
+      throw err;
+    });
   }
-  return dbInstance;
+  return dbPromise;
 }
 
 export function resetDatabaseInstance(): void {
   dbInstance = null;
+  dbPromise = null;
 }
